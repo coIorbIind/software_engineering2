@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from router import api_router
+from execptions import BaseAPIException, exception_handler
 
 
 app = FastAPI()
@@ -12,3 +13,6 @@ async def ping():
 
 
 app.include_router(api_router, prefix='/api/v1')
+
+
+app.exception_handler(BaseAPIException)(exception_handler)
