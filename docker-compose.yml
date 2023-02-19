@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  api:
+    build: .
+    environment:
+      - DB_USER=postgres
+      - USER_PASSWORD=1234
+      - DB_NAME=database
+      - HOST=db
+    depends_on:
+      - db
+    volumes:
+      - ./:/code
+    ports:
+      - "8000:8000"
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=database
