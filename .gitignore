@@ -2,3 +2,5 @@ venv/
 *__pycache__*
 .idea
 test_main.http
+.env
+Command_Line_Utils.egg-info

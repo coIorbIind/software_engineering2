@@ -23,3 +23,9 @@ class Article(Base):
     created_at = Column(DateTime, name='created_at', nullable=False)
     author = Column(String, name='author', nullable=True, index=True)
     tags = relationship('Tag', secondary='article_tags')
+
+    def __str__(self):
+        return f'Article: {self.name}'
+
+    def __repr__(self):
+        return f'Article: {self.name}'
