@@ -8,7 +8,7 @@ class ArticleTag(Base):
     __tablename__ = 'article_tags'
     id = Column(Integer, name='id', primary_key=True, autoincrement=True, index=True)
     article_id = Column(Integer, ForeignKey('article.id', ondelete='CASCADE'))
-    article = relationship('Article', overlaps='article_tags,tags')
+    article = relationship('Article', overlaps='article_tags,articles')
     tag_id = Column(Integer, ForeignKey('tag.id', ondelete='CASCADE'))
     tag = relationship('Tag', overlaps='article_tags,tags')
 
@@ -22,7 +22,7 @@ class Article(Base):
     content = Column(String, name='content', nullable=False)
     created_at = Column(DateTime, name='created_at', nullable=False)
     author = Column(String, name='author', nullable=True, index=True)
-    tags = relationship('Tag', secondary='article_tags')
+    tags = relationship('Tag', secondary='article_tags', back_populates='articles', overlaps='article')
 
     def __str__(self):
         return f'Article: {self.name}'

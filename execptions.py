@@ -27,13 +27,17 @@ class BaseAPIException(Exception):
 class ObjectNotFound(BaseAPIException):
     status_code = 404
     code = 'object_not_fount'
-    message = 'Запись не найдена'
+    message = 'Объект не найден'
 
 
 class UniqueFailed(BaseAPIException):
     status_code = 400
     code = 'unique constraint failed'
     message = 'Нарушена уникальность поля'
+
+
+class ConsoleError(Exception):
+    pass
 
 
 def exception_handler(request: Request, exception: BaseAPIException) -> JSONResponse:
