@@ -1,19 +1,36 @@
 from typing import Optional
 from datetime import datetime
 
+from fastapi_filter.contrib.sqlalchemy import Filter
+from pydantic import Field
 from sqlalchemy import insert
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, Query
 
 from db import Article, Tag, ArticleTag
 from execptions import ObjectNotFound
 from api.schemas.article import ArticleCreateSchema
 
 
+class ArticleFilter(Filter):
+    name__in: Optional[list[str]] = Field(alias='names')
+    code__in: Optional[list[str]] = Field(alias='codes')
+
+    class Constants(Filter.Constants):
+        model = Article
+
+    class Config:
+        allow_population_by_field_name = True
+
+
+def get_articles(session: Session, filter_obj: ArticleFilter, joined_load: Optional[tuple] = None) -> Query:
+    return filter_obj.filter(session.query(Article).options(joinedload(joined_load)))
+
+
 def get_article_by_code(
     session: Session,
     code: str,
     joined_load: Optional[tuple] = None
-):
+) -> Optional[Article]:
     query = session.query(Article).filter(Article.code == code)
     if joined_load:
         query = query.options(*[joinedload(table) for table in joined_load])
@@ -24,7 +41,7 @@ def get_article_by_code_or_404(
     session: Session,
     code: str,
     joined_load: Optional[tuple] = None
-):
+) -> Article:
     obj = get_article_by_code(session, code, joined_load)
     if not obj:
         raise ObjectNotFound
@@ -34,7 +51,7 @@ def get_article_by_code_or_404(
 def create_article(
     session: Session,
     article: ArticleCreateSchema
-):
+) -> Article:
     data = article.dict()
     tags = data.pop('tags', None)
     obj = Article(**data, created_at=datetime.now())
