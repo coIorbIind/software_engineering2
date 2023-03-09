@@ -16,6 +16,7 @@ from crud.article import (
     get_articles
 )
 from logic.execptions import UniqueFailed
+from logic.pagination import LimitOffsetPagination
 
 
 router = InferringRouter()
@@ -25,6 +26,7 @@ router = InferringRouter()
 class ArticleRoute(BaseRoute):
     model = Article
     joined_load = ('tags', )
+    paginator = LimitOffsetPagination()
 
     @router.get('/{code}')
     def get_article(self, code: str) -> ArticleListSchema:
@@ -43,19 +45,15 @@ class ArticleRoute(BaseRoute):
     def list(
             self,
             tag_codes: Optional[list[str]] = Query(default=None),
-            filter_obj: ArticleFilter = FilterDepends(ArticleFilter)
+            filter_obj: ArticleFilter = FilterDepends(ArticleFilter),
+            limit: int = 5,
+            offset: int = 0
     ) -> list[ArticleListSchema]:
         """ Получение списка статей """
         articles = get_articles(self.session, filter_obj, joined_load=self.joined_load)
         if tag_codes:
-            articles = (
-                self.session
-                .execute(
-                    articles.join(ArticleTag)
-                    .join(Tag)
-                    .filter(Tag.code.in_(tag_codes))
-                ).scalars().all()
-            )
+            articles = articles.join(ArticleTag).join(Tag).filter(Tag.code.in_(tag_codes))
+        articles = self.session.execute(self.paginator.paginate(articles, limit, offset)).scalars().all()
         for article in articles:
             article.tags = sorted(article.tags, key=lambda tag: tag.name)
         return articles

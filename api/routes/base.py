@@ -8,3 +8,4 @@ from db.base import get_session
 class BaseRoute:
     session: Session = Depends(get_session)
     model = None
+    paginator = None
