@@ -7,11 +7,12 @@ from sqlalchemy import insert
 from sqlalchemy.orm import Session, joinedload, Query
 
 from db import Article, Tag, ArticleTag
-from execptions import ObjectNotFound
+from logic.execptions import ObjectNotFound
 from api.schemas.article import ArticleCreateSchema
 
 
 class ArticleFilter(Filter):
+    """ Фильтр для статей """
     name__in: Optional[list[str]] = Field(alias='names')
     code__in: Optional[list[str]] = Field(alias='codes')
 
@@ -23,6 +24,7 @@ class ArticleFilter(Filter):
 
 
 def get_articles(session: Session, filter_obj: ArticleFilter, joined_load: Optional[tuple] = None) -> Query:
+    """ Список статей """
     return filter_obj.filter(session.query(Article).options(joinedload(joined_load)))
 
 
@@ -31,6 +33,7 @@ def get_article_by_code(
     code: str,
     joined_load: Optional[tuple] = None
 ) -> Optional[Article]:
+    """ Получение объекта статьи """
     query = session.query(Article).filter(Article.code == code)
     if joined_load:
         query = query.options(*[joinedload(table) for table in joined_load])
@@ -42,6 +45,7 @@ def get_article_by_code_or_404(
     code: str,
     joined_load: Optional[tuple] = None
 ) -> Article:
+    """ Получение статьи. 404 ошибка, если она не найдена """
     obj = get_article_by_code(session, code, joined_load)
     if not obj:
         raise ObjectNotFound
@@ -52,6 +56,7 @@ def create_article(
     session: Session,
     article: ArticleCreateSchema
 ) -> Article:
+    """ Создание статьи """
     data = article.dict()
     tags = data.pop('tags', None)
     obj = Article(**data, created_at=datetime.now())

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, declarative_base
 
 from fastapi_utils.session import FastAPISessionMaker
 
-from config import settings
+from logic.config import settings
 
 
 def get_session() -> Iterator[Session]:

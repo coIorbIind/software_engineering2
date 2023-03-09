@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from sqlalchemy import create_engine
 
-from router import api_router
-from execptions import BaseAPIException, exception_handler
+from logic.router import api_router
+from logic.execptions import BaseAPIException, exception_handler
 from db.base import Base
-from config import settings
+from logic.config import settings
 
 Base.metadata.create_all(bind=create_engine(settings.database_url))
 

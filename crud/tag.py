@@ -3,7 +3,7 @@ from sqlalchemy.orm import joinedload
 
 from db import Tag
 from db.base import get_session
-from execptions import ObjectNotFound, ConsoleError
+from logic.execptions import ObjectNotFound, ConsoleError
 
 
 def get_tag_from_console():

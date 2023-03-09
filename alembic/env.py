@@ -6,8 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from db.base import Base
-from db import Tag, Article, ArticleTag
-from config import settings
+from logic.config import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

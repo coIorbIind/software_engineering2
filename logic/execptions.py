@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 
 
 class BaseAPIException(Exception):
+    """ Базовое исключение """
     status_code = 500
     code = 'exception'
     message = 'Ошибка!'
@@ -25,22 +26,26 @@ class BaseAPIException(Exception):
 
 
 class ObjectNotFound(BaseAPIException):
+    """ Объект не найден """
     status_code = 404
     code = 'object_not_fount'
     message = 'Объект не найден'
 
 
 class UniqueFailed(BaseAPIException):
+    """ Нарушена уникальность поля """
     status_code = 400
     code = 'unique constraint failed'
     message = 'Нарушена уникальность поля'
 
 
 class ConsoleError(Exception):
+    """ Ошибка при вызове консольной команды """
     pass
 
 
 def exception_handler(request: Request, exception: BaseAPIException) -> JSONResponse:
+    """ Перевод исключения в json """
     return JSONResponse(
         status_code=exception.status_code,
         content=exception.to_json()

@@ -15,7 +15,7 @@ from crud.article import (
     ArticleFilter,
     get_articles
 )
-from execptions import UniqueFailed
+from logic.execptions import UniqueFailed
 
 
 router = InferringRouter()
@@ -28,12 +28,14 @@ class ArticleRoute(BaseRoute):
 
     @router.get('/{code}')
     def get_article(self, code: str) -> ArticleListSchema:
+        """ Получение статьи по её коду """
         article = get_article_by_code_or_404(session=self.session, code=code, joined_load=self.joined_load)
         article.tags = sorted(article.tags, key=lambda tag: tag.name)
         return article
 
     @router.post('/')
     def create(self, article: ArticleCreateSchema) -> ArticleListSchema:
+        """ Создание статьи """
         self._validate_name_and_code(code=article.code, name=article.name)
         return create_article(self.session, article)
 
@@ -43,6 +45,7 @@ class ArticleRoute(BaseRoute):
             tag_codes: Optional[list[str]] = Query(default=None),
             filter_obj: ArticleFilter = FilterDepends(ArticleFilter)
     ) -> list[ArticleListSchema]:
+        """ Получение списка статей """
         articles = get_articles(self.session, filter_obj, joined_load=self.joined_load)
         if tag_codes:
             articles = (
@@ -58,6 +61,7 @@ class ArticleRoute(BaseRoute):
         return articles
 
     def _validate_name_and_code(self, code: str, name: str):
+        """ Проверка уникальности имени и кода статьи """
         same_articles_count = self.session.query(Article).filter(
             or_(
                 Article.name == name,

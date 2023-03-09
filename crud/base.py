@@ -6,7 +6,7 @@ from faker import Faker
 
 from db.base import Base, get_session
 from db import Article, Tag, ArticleTag
-from execptions import ObjectNotFound
+from logic.execptions import ObjectNotFound
 
 
 def get_object_or_404(
