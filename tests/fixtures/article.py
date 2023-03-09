@@ -1,7 +1,7 @@
 import pytest
 import factory
 
-from db.article import Article
+from db import Article, ArticleTag
 
 
 @pytest.fixture
@@ -22,3 +22,17 @@ def article_factory(scope_session, faker):
         author = faker.name()
 
     return ArticleFactory
+
+
+@pytest.fixture
+def article_tag_factory(scope_session, article_factory, tag_factory):
+    class ArticleTagFactory(factory.alchemy.SQLAlchemyModelFactory):
+        class Meta:
+            model = ArticleTag
+            sqlalchemy_session = scope_session
+            sqlalchemy_session_persistence = 'commit'
+
+        article = factory.SubFactory(article_factory)
+        tag = factory.SubFactory(tag_factory)
+
+    return ArticleTagFactory

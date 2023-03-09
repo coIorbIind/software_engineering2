@@ -1,21 +1,23 @@
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, session
 
 from db.base import Base, get_session
+from logic.config import settings
 from main import get_app
 
-from .fixtures.article import article_factory
+from .fixtures.article import article_factory, article_tag_factory
+from .fixtures.tag import tag_factory
 
 
 @pytest.fixture
 def scope_session() -> Session:
-    db_session = next(get_session())
-    Base.metadata.bind = db_session.bind
     session.close_all_sessions()
-    Base.metadata.drop_all()
-    Base.metadata.create_all()
-    return db_session
+    engine = create_engine(settings.database_url)
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    return next(get_session())
 
 
 @pytest.fixture
