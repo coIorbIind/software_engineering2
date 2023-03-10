@@ -4,7 +4,7 @@ from db import Article
 
 
 @pytest.mark.parametrize('correct', [True, False])
-def test_get_article(client, article_factory, correct):
+def test_get_article(client, article_factory, correct, scope_session):
     article = article_factory()
     path = f'/api/v1/posts/{article.code}'
     status_code = 200
