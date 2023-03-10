@@ -2,9 +2,9 @@ import os
 
 
 class Settings:
-    DB_USER = 'test_user'
+    DB_USER = 'postgres'
     USER_PASSWORD = 1234
-    DB_NAME = 'testing_db'
+    DB_NAME = 'database'
     HOST = 'localhost'
 
     @property

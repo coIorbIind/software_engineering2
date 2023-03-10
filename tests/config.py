@@ -4,6 +4,10 @@ from logic.config import Settings as BaseSettings
 
 
 class Settings(BaseSettings):
+    DB_USER = 'test_user'
+    USER_PASSWORD = 1234
+    DB_NAME = 'testing_db'
+    HOST = 'test_db'
 
     @property
     def database_url(self) -> str:
