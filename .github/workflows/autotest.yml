@@ -38,7 +38,7 @@ jobs:
     - name: Create docker containers
       run: docker compose -f "docker-compose.yml" up --build -d
     - name: Run pytest
-      run: docker exec -it api_container pytest
+      run: docker exec api_container pytest
     - name: Stop containers
       if: always()
       run: docker compose -f "docker-compose.yml" down
