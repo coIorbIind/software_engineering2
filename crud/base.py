@@ -26,6 +26,7 @@ def get_object_or_404(
 
 def seed_db():
     session = next(get_session())
+    Base.metadata.create_all(bind=session.bind)
     faker = Faker()
     fake_article_slugs, fake_tag_slugs, fake_article_names, fake_tag_names = set(), set(), set(), set()
     for _ in range(100):
