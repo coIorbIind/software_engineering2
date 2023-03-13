@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, session
 
-from db.base import Base, get_session
+from db.base import Base, get_session, get_session_for_api
 from .config import settings
 from main import get_app
 
@@ -27,5 +27,5 @@ def scope_session() -> Session:
 @pytest.fixture
 def client() -> TestClient:
     app = get_app()
-    app.dependency_overrides[get_session] = override_get_session
+    app.dependency_overrides[get_session_for_api] = override_get_session
     yield TestClient(app)
