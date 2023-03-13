@@ -12,6 +12,10 @@ def get_session(url: Optional[str] = None) -> Iterator[Session]:
     yield from fastapi_session_maker(url).get_db()
 
 
+def get_session_for_api() -> Iterator[Session]:
+    yield from fastapi_session_maker().get_db()
+
+
 @lru_cache()
 def fastapi_session_maker(url: Optional[str] = None) -> FastAPISessionMaker:
     if not url:
