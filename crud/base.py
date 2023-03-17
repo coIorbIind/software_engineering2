@@ -29,11 +29,31 @@ def seed_db():
     Base.metadata.create_all(bind=session.bind)
     faker = Faker()
     fake_article_slugs, fake_tag_slugs, fake_article_names, fake_tag_names = set(), set(), set(), set()
+    old_article_slugs, old_tag_slugs, old_article_names, old_tag_names = set(), set(), set(), set()
+
+    for name, code in session.query(Article.name, Article.code).all():
+        old_article_slugs.add(code)
+        old_article_names.add(name)
+
+    for name, code in session.query(Tag.name, Tag.code).all():
+        old_tag_slugs.add(code)
+        old_tag_names.add(name)
+
     for _ in range(100):
-        fake_article_slugs.add(faker.slug())
-        fake_tag_slugs.add(faker.slug())
-        fake_article_names.add(faker.sentence())
-        fake_tag_names.add(faker.word())
+        new_article_slug = faker.unique.slug()
+        new_tag_slug = faker.unique.slug()
+        new_article_name = faker.unique.sentence()
+        new_tag_name = faker.unique.word()
+        if (
+            new_article_slug in old_article_slugs or new_article_name in old_article_names
+            or new_tag_name in old_tag_names or new_tag_slug in old_tag_slugs
+        ):
+            continue
+        fake_article_slugs.add(faker.unique.slug())
+        fake_tag_slugs.add(faker.unique.slug())
+        fake_article_names.add(faker.unique.sentence())
+        fake_tag_names.add(faker.unique.word())
+
     fake_article_slugs = list(fake_article_slugs)
     fake_tag_slugs = list(fake_tag_slugs)
     fake_article_names = list(fake_article_names)
