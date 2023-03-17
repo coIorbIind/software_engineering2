@@ -16,9 +16,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=1234
-      - POSTGRES_DB=database
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: database
   test_db:
     container_name: testing_db
     image: postgres
@@ -28,6 +28,6 @@ services:
     depends_on:
       - db
     environment:
-      - POSTGRES_USER=test_user
-      - POSTGRES_PASSWORD=1234
-      - POSTGRES_DB=testing_db
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: testing_db

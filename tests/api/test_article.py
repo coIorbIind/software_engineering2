@@ -60,7 +60,13 @@ def test_articles_pagination(client, article_factory, limit, offset, length):
         q = f'?limit={limit}&offset={offset}'
     response = client.get('/api/v1/posts/' + q)
     assert response.status_code == 200
-    data = response.json()
+    data = response.json()['data']
+    pagination = response.json()['pagination']
+    assert pagination == {
+        'limit': limit if limit else 5,
+        'offset': offset if offset else 0,
+        'total': 5
+    }
 
     assert len(data) == length
     assert all([data[i]['name'] == articles[offset + i].name for i in range(length)])
@@ -75,7 +81,7 @@ def test_tags_sorting(client, article_factory, tag_factory, article_tag_factory)
 
     response = client.get('/api/v1/posts/')
     assert response.status_code == 200
-    data = response.json()[0]
+    data = response.json()['data'][0]
     assert data['tags'][0]['name'] == first_tag.name
     assert data['tags'][1]['name'] == last_tag.name
 
@@ -104,7 +110,7 @@ def test_articles_filter(
         q += f'tag_codes={tag1.code}&tag_codes={tag2.code}'
     response = client.get('/api/v1/posts/' + q)
     assert response.status_code == 200
-    data = response.json()
+    data = response.json()['data']
     if with_name or with_code:
         assert len(data) == 1
         assert data[0]['name'] == article_by_name_and_code.name
