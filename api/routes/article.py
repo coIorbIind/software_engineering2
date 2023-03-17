@@ -5,16 +5,24 @@ from fastapi_utils.cbv import cbv
 from fastapi_utils.inferring_router import InferringRouter
 from fastapi_filter import FilterDepends
 from sqlalchemy import or_
+from starlette.responses import Response
+from starlette.status import HTTP_204_NO_CONTENT
 
 from db import Article, Tag, ArticleTag
 from api.routes.base import BaseRoute
-from api.schemas.article import ArticleListSchema, ArticleCreateSchema
+from api.schemas.article import (
+    ArticleListSchema,
+    ArticleCreateSchema,
+    ArticlePutSchema,
+    ArticlePatchSchema,
+)
 from api.schemas.base import PaginatedResponse, LimitOffsetPaginationSchema
 from crud.article import (
     get_article_by_code_or_404,
     create_article,
     ArticleFilter,
-    get_articles
+    get_articles,
+    patch_article,
 )
 from logic.execptions import UniqueFailed
 from logic.pagination import LimitOffsetPagination
@@ -62,6 +70,33 @@ class ArticleRoute(BaseRoute):
             data=articles,
             pagination=LimitOffsetPaginationSchema(limit=limit, offset=offset, total=total)
         )
+
+    @router.put('/{code}')
+    def put_article(self, code: str, article: ArticlePutSchema) -> ArticleListSchema:
+        """ Создание статьи """
+        db_obj = get_article_by_code_or_404(session=self.session, code=code, joined_load=self.joined_load)
+        self._validate_name_and_code(code=article.code, name=article.name)
+        return patch_article(self.session, obj=db_obj, schema=article)
+
+    @router.patch('/{code}')
+    def patch_article(self, code: str, article: ArticlePatchSchema) -> ArticleListSchema:
+        """ Создание статьи """
+        db_obj = get_article_by_code_or_404(session=self.session, code=code, joined_load=self.joined_load)
+        self._validate_name_and_code(code=article.code, name=article.name)
+        return patch_article(self.session, obj=db_obj, schema=article)
+
+    @router.delete('/{code}')
+    def delete_article(self, code: str):
+        """ Получение статьи по её коду """
+        article = get_article_by_code_or_404(session=self.session, code=code, joined_load=self.joined_load)
+        (
+            self.session.query(Article)
+            .filter(
+                Article.id == article.id
+            ).delete()
+        )
+
+        return Response(status_code=HTTP_204_NO_CONTENT)
 
     def _validate_name_and_code(self, code: str, name: str):
         """ Проверка уникальности имени и кода статьи """
