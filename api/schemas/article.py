@@ -12,10 +12,26 @@ class ArticleBaseSchema(BaseSchema):
     author: str
 
 
+class ArticlePatchSchema(BaseSchema):
+    name: typing.Optional[str]
+    code: typing.Optional[str]
+    content: typing.Optional[str]
+    author: typing.Optional[str]
+    tags: typing.Optional[list[str]]
+
+
+class ArticlePutSchema(BaseSchema):
+    name: str
+    code: str
+    content: str
+    author: str
+    tags: list[str]
+
+
 class ArticleCreateSchema(ArticleBaseSchema):
-    tags: typing.Optional[typing.List[str]]
+    tags: typing.Optional[list[str]]
 
 
 class ArticleListSchema(ArticleBaseSchema):
     created_at: datetime
-    tags: typing.List[TagBaseSchema]
+    tags: list[TagBaseSchema]

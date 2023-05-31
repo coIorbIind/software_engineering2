@@ -117,3 +117,52 @@ def test_articles_filter(
     else:
         assert len(data) == 2
         assert {item['name'] for item in data} == {article_by_name_and_code.name, article_by_to_tags.name}
+
+
+@pytest.mark.parametrize('with_error', [True, False])
+def test_patch_article(client, article_factory, with_error, scope_session):
+    new_name = 'new name'
+    status_code = 200
+    if with_error:
+        article_factory(name=new_name)
+        status_code = 400
+
+    article = article_factory()
+    old_name = article.name
+    response = client.patch(f'/api/v1/posts/{article.code}', json={'name':new_name})
+    assert response.status_code == status_code
+
+    scope_session.refresh(article)
+    if with_error:
+        assert article.name == old_name
+    else:
+        assert article.name == new_name
+
+
+def test_delete_article(client, article_factory, scope_session):
+    article = article_factory()
+    response = client.delete(f'/api/v1/posts/{article.code}')
+    assert response.status_code == 204
+
+    assert scope_session.query(Article).filter(Article.code == article.code).first() is None
+
+
+def test_put_article(client, article_factory, tag_factory, article_tag_factory, scope_session):
+    tag = tag_factory()
+    article = article_factory()
+    article_tag_factory(article=article, tag=tag)
+
+    data = {
+        'name': 'name',
+        'code': 'code',
+        'author': 'author',
+        'content': 'content',
+        'tags': []
+    }
+
+    response = client.put(f'/api/v1/posts/{article.code}', json=data)
+    assert response.status_code == 200
+
+    scope_session.refresh(article)
+    for key, value in data.items():
+        assert getattr(article, key) == value
