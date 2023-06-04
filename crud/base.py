@@ -7,6 +7,7 @@ from faker import Faker
 from db.base import Base, get_session
 from db import Article, Tag, ArticleTag
 from logic.execptions import ObjectNotFound
+from logic.elastic_search import create_document
 
 
 def get_object_or_404(
@@ -42,7 +43,7 @@ def seed_db():
     for _ in range(100):
         new_article_slug = faker.unique.slug()
         new_tag_slug = faker.unique.slug()
-        new_article_name = faker.unique.sentence()
+        new_article_name = faker.sentence()
         new_tag_name = faker.unique.word()
         if (
             new_article_slug in old_article_slugs or new_article_name in old_article_names
@@ -51,7 +52,7 @@ def seed_db():
             continue
         fake_article_slugs.add(faker.unique.slug())
         fake_tag_slugs.add(faker.unique.slug())
-        fake_article_names.add(faker.unique.sentence())
+        fake_article_names.add(faker.sentence())
         fake_tag_names.add(faker.unique.word())
 
     fake_article_slugs = list(fake_article_slugs)
@@ -86,3 +87,6 @@ def seed_db():
     session.add_all(tags)
     session.add_all(relations)
     session.commit()
+
+    for article in articles:
+        create_document(article)

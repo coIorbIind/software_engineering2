@@ -1,17 +1,7 @@
 version: "3.9"
 services:
-  api:
-    container_name: api_container
-    env_file:
-      - .env
-    build: .
-    depends_on:
-      - db
-      - test_db
-    ports:
-      - "8000:8000"
   db:
-    container_name: db_container
+    container_name: software_engineering_db_container
     image: postgres
     ports:
       - "5432:5432"
@@ -31,3 +21,24 @@ services:
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: testing_db
+  elastic_search:
+    container_name: elasticsearch_container
+    image: elasticsearch:7.11.1
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+  api:
+    container_name: software_engineering_api_container
+    volumes:
+      - "./logic/elastic_search.py:/code/logic/elastic_search.py"
+    env_file:
+      - .env
+    build: .
+    depends_on:
+      - db
+#      - test_db
+      - elastic_search
+    ports:
+      - "8000:8000"
