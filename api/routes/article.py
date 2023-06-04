@@ -15,6 +15,7 @@ from api.schemas.article import (
     ArticleCreateSchema,
     ArticlePutSchema,
     ArticlePatchSchema,
+    ArticleSearchSchema,
 )
 from api.schemas.base import PaginatedResponse, LimitOffsetPaginationSchema
 from crud.article import (
@@ -26,6 +27,7 @@ from crud.article import (
 )
 from logic.execptions import UniqueFailed
 from logic.pagination import LimitOffsetPagination
+from logic.elastic_search import create_document, search_document
 
 
 router = InferringRouter()
@@ -48,7 +50,9 @@ class ArticleRoute(BaseRoute):
     def create(self, article: ArticleCreateSchema) -> ArticleListSchema:
         """ Создание статьи """
         self._validate_name_and_code(code=article.code, name=article.name)
-        return create_article(self.session, article)
+        article = create_article(self.session, article)
+        create_document(article)
+        return article
 
     @router.get('/')
     def list(
@@ -97,6 +101,23 @@ class ArticleRoute(BaseRoute):
         )
 
         return Response(status_code=HTTP_204_NO_CONTENT)
+
+    @router.post('/search')
+    def search(self, data: ArticleSearchSchema) -> PaginatedResponse:
+        ids = search_document(
+            filters=data.filter.dict(exclude_unset=True),
+            limit=data.pagination.limit,
+            offset=data.pagination.offset,
+        )
+        articles = self.session.query(Article).filter(Article.id.in_(ids))
+        return PaginatedResponse(
+            data=articles.all(),
+            pagination=LimitOffsetPaginationSchema(
+                limit=data.pagination.limit,
+                offset=data.pagination.offset,
+                total=articles.count()
+            )
+        )
 
     def _validate_name_and_code(self, code: str, name: str):
         """ Проверка уникальности имени и кода статьи """

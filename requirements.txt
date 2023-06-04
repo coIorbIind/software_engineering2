@@ -27,3 +27,4 @@ factory-boy==3.2.1
 pytest==7.2.2
 httpx==0.23.3
 fastapi-filter==0.5.2
+requests==2.31.0

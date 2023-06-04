@@ -1,5 +1,6 @@
 from datetime import datetime
 import typing
+from pydantic import BaseModel
 
 from api.schemas.base import BaseSchema
 from api.schemas.tag import TagBaseSchema
@@ -35,3 +36,20 @@ class ArticleCreateSchema(ArticleBaseSchema):
 class ArticleListSchema(ArticleBaseSchema):
     created_at: datetime
     tags: list[TagBaseSchema]
+
+
+class ArticleFilterSchema(BaseModel):
+    name: typing.Optional[str] = None
+    code: typing.Optional[str] = None
+    content: typing.Optional[str] = None
+    author: typing.Optional[str] = None
+
+
+class PaginationInSearchSchema(BaseModel):
+    limit: int = 5
+    offset: int = 0
+
+
+class ArticleSearchSchema(BaseModel):
+    filter: ArticleFilterSchema
+    pagination: PaginationInSearchSchema

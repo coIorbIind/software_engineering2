@@ -39,6 +39,13 @@ class UniqueFailed(BaseAPIException):
     message = 'Нарушена уникальность поля'
 
 
+class SearchError(BaseAPIException):
+    """ Ошибка при поиске в elastic_search """
+    status_code = 400
+    code = 'search error'
+    message = 'Ошибка при поиске в elastic_search'
+
+
 class ConsoleError(Exception):
     """ Ошибка при вызове консольной команды """
     pass
